@@ -12,6 +12,7 @@ func compile(jpp string) string {
 	jpp = "\n\n" + jpp
 	jpp = strings.ReplaceAll(jpp, "    ", "  ")
 	jpp = strings.ReplaceAll(jpp, "  ", "\n")
+	ec := false
 	cpp := bytes.NewBufferString("#include <cstdint>\n" +
 		"#define i8 char\n" +
 		"#define i16 int16_t\n" +
@@ -34,6 +35,10 @@ func compile(jpp string) string {
 		l := 0
 		if context == 1 && c == '\n' {
 			context = 0
+		}
+		if ec && c == '{' {
+			cpp.WriteByte(')')
+			ec = false
 		}
 		if context == 2 && c == '"' {
 			context = 0
@@ -60,6 +65,24 @@ func compile(jpp string) string {
 		if i != 0 {
 			if c == '\n' && jpp[i-1] == '\n' {
 				continue
+			}
+			if i >= 2 {
+				if c == ' ' && jpp[i-1] == 'f' && jpp[i-2] == 'i' {
+					cpp.WriteByte('(')
+					ec = true
+				}
+			}
+			if i >= 3 {
+				if c == ' ' && jpp[i-1] == 'r' && jpp[i-2] == 'o' && jpp[i-3] == 'f' {
+					cpp.WriteByte('(')
+					ec = true
+				}
+			}
+			if i >= 6 {
+				if c == ' ' && jpp[i-1] == 'e' && jpp[i-2] == 'l' && jpp[i-3] == 'i' && jpp[i-4] == 'h' && jpp[i-5] == 'w' {
+					cpp.WriteByte('(')
+					ec = true
+				}
 			}
 			if i < len(jpp)-1 && c == '$' && jpp[i+1] == '!' {
 				s := strings.SplitN(jpp[i+1:], " ", 2)[0]
