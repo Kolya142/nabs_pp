@@ -128,6 +128,9 @@ func compile(jpp string) string {
 						if sp[i] == "ss+" {
 							cpp.WriteString("#include <string.h>")
 						}
+						if sp[i] == "uni" {
+							cpp.WriteString("#include <unistd.h>")
+						}
 						if sp[i] == "io+" {
 							cpp.WriteString("#include <iostream>\n")
 						}
