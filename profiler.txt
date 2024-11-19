@@ -1,0 +1,11 @@
+Program started
+function test at test1.jpp_c.cpp:21 started
+function test at test1.jpp_c.cpp:21 ended, time: 0s, 0ms
+function test at test1.jpp_c.cpp:21 started
+function test at test1.jpp_c.cpp:21 ended, time: 0s, 0ms
+function test at test1.jpp_c.cpp:21 started
+function test at test1.jpp_c.cpp:21 ended, time: 0s, 0ms
+function test at test1.jpp_c.cpp:21 started
+function test at test1.jpp_c.cpp:21 ended, time: 0s, 0ms
+function test at test1.jpp_c.cpp:21 started
+function test at test1.jpp_c.cpp:21 ended, time: 0s, 0ms
