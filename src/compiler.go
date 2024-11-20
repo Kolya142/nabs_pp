@@ -14,16 +14,16 @@ func compile(jpp string) string {
 	jpp = strings.ReplaceAll(jpp, "  ", "\n")
 	ec := false
 	cpp := bytes.NewBufferString("#include <cstdint>\n" +
-		"#define i8 char\n" +
+		"#define i8 int8_t\n" +
 		"#define i16 int16_t\n" +
 		"#define i32 int\n" +
 		"#define i64 long\n" +
 		"#define i128 long long\n" +
 		"#define u8 char\n" +
-		"#define u16 int16_t\n" +
-		"#define u32 int\n" +
-		"#define u64 long\n" +
-		"#define u128 long long\n" +
+		"#define u16 uint16_t\n" +
+		"#define u32 uint\n" +
+		"#define u64 ulong\n" +
+		"#define u128 ulong long\n" +
 		"#define alloc(T, S) (T*)malloc(sizeof(T)*S)\n" +
 		"#define pbegin Nabs::PFunc profiler_wrap = Nabs::PBegin(__FILE__, __FUNCTION__, __LINE__)\n" +
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
@@ -126,10 +126,10 @@ func compile(jpp string) string {
 							cpp.WriteString("#include <cstring.h>\n")
 						}
 						if sp[i] == "ss+" {
-							cpp.WriteString("#include <string.h>")
+							cpp.WriteString("#include <string.h>\n")
 						}
 						if sp[i] == "uni" {
-							cpp.WriteString("#include <unistd.h>")
+							cpp.WriteString("#include <unistd.h>\n")
 						}
 						if sp[i] == "io+" {
 							cpp.WriteString("#include <iostream>\n")
