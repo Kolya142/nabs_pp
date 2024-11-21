@@ -14,21 +14,12 @@
 #define pend Nabs::PEnd(profiler_wrap)
 #define ppbegin Nabs::PClear()
 #define str i8*
-
-#include <stdio.h>
-#include "nabs/profiler.hpp"
-#
-i32 test(i32 a, i32 b) {
-pbegin;
-pend;
-return a+b;
+if( 3 < 6 ){
+x = 3;
 }
-int main() {
-ppbegin;
-
-i32 i = 0;
-for (i32 __UVxeQqsQy = 0; __UVxeQqsQy < 5; __UVxeQqsQy++) { ;
-i = test(i, 1);
-printf("iterate: %d\n", i);
+for( i32 i = 0; i < 5; i++ ){
+do something...;
 }
+while( true ){
+1;
 }

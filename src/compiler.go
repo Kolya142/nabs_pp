@@ -28,7 +28,7 @@ func compile(jpp string) string {
 		"#define pbegin Nabs::PFunc profiler_wrap = Nabs::PBegin(__FILE__, __FUNCTION__, __LINE__)\n" +
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
 		"#define ppbegin Nabs::PClear()\n" +
-		"#define str i8*")
+		"#define str u8*\n")
 	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - multiline comment, 4 - replaced, 5 - close with )
 	for i := 0; i < len(jpp); i++ {
 		c := jpp[i]
@@ -100,6 +100,15 @@ func compile(jpp string) string {
 						vname += string(letterRunes[rand.Intn(len(letterRunes))])
 					}
 					cpp.WriteString("for (i32 " + vname + " = 0; " + vname + " < " + l + "; " + vname + "++")
+					context = 5
+				}
+				if strings.HasPrefix(sp, "for(") {
+					sP := strings.SplitN(sp[4:], ";", 3)
+					vtype := sP[0]
+					vname := sP[1]
+					Sp := strings.SplitN(sP[2], "..", 2)
+					Sp[1] = Sp[1][:len(Sp[1])-1]
+					cpp.WriteString("for (" + vtype + " " + vname + " = " + Sp[0] + "; " + vname + " < " + Sp[1] + "; " + vname + "++")
 					context = 5
 				}
 				if sp == "main" {
