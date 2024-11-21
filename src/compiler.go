@@ -29,6 +29,8 @@ func compile(jpp string) string {
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
 		"#define ppbegin Nabs::PClear()\n" +
 		"#define str u8*\n")
+
+	wrap := 0
 	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - multiline comment, 4 - replaced, 5 - close with )
 	for i := 0; i < len(jpp); i++ {
 		c := jpp[i]
@@ -40,6 +42,12 @@ func compile(jpp string) string {
 			cpp.WriteByte(')')
 			ec = false
 		}
+		if c == '(' && context == 5 {
+			wrap++
+		}
+		if c == ')' && context == 5 {
+			wrap--
+		}
 		if context == 2 && c == '"' {
 			context = 0
 			l = 1
@@ -47,7 +55,7 @@ func compile(jpp string) string {
 		if context == 4 && c == ' ' {
 			context = 0
 		}
-		if context == 5 && c == ')' {
+		if context == 5 && c == ')' && wrap == 0 {
 			context = 0
 		}
 		if c == '/' && jpp[i+1] == '/' {
