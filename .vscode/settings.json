@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.jpp": "cpp",
+        "random": "cpp"
+    }
+}
