@@ -1,0 +1,17 @@
+{
+    "language": "c++",
+    "compiler_args": "",
+    "includes": {
+        "jppd": ["tests"],
+        "jppf": [],
+        "cppd": [],
+        "cppf": []
+    },
+    "output_dir": "cpps",
+    "macros": [
+        {
+            "pattern": "add(i32 *, i32 *)",
+            "function": "macroses/add_function.py:add_jpp"
+        }
+    ]
+}
