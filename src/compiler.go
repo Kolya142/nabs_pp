@@ -31,7 +31,7 @@ func compile(jpp string) string {
 		"#define str u8*\n")
 
 	wrap := 0
-	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - multiline comment, 4 - replaced, 5 - close with )
+	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - char, 4 - replaced, 5 - close with )
 	for i := 0; i < len(jpp); i++ {
 		c := jpp[i]
 		l := 0
@@ -64,7 +64,15 @@ func compile(jpp string) string {
 		if context == 0 && c == '"' && l == 0 {
 			context = 2
 		}
-		if context == 2 || context == 1 || context == 4 || context == 5 {
+		l = 0
+		if c == '\'' && context == 3 {
+			context = 0
+			l = 1
+		}
+		if c == '\'' && context == 3 && l == 1 {
+			context = 0
+		}
+		if context == 2 || context == 1 || context == 4 || context == 5 || context == 3 {
 			if context == 2 {
 				cpp.WriteByte(c)
 			}

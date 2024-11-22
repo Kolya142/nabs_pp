@@ -9,7 +9,7 @@ if sys.argv[1] == "test":
     os.system("python3 test.py")
 
 if sys.argv[1] == "install":
-    if os.path.exists("/bin/jpp"):
+    if not os.path.exists("/bin/jpp"):
         os.system("sudo cp compiler /bin/jpp")
         os.system(f"sudo chown -c {os.getuid()} /bin/jpp")
     else:
