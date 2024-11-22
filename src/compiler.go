@@ -107,7 +107,7 @@ func compile(jpp string) string {
 
 				sp := strings.ReplaceAll(strings.Split(s[1:], " ")[0], " ", "")
 				if sp == "loop" {
-					cpp.WriteString(" for (;;)")
+					cpp.WriteString("for (;;)")
 				}
 				if strings.HasPrefix(sp, "forr(") {
 					vname := "_"
