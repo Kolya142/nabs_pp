@@ -19,6 +19,7 @@ func compile(jpp string) string {
 		"#define i32 int\n" +
 		"#define i64 long\n" +
 		"#define i128 long long\n" +
+		"#define u0 void\n" +
 		"#define u8 char\n" +
 		"#define u16 uint16_t\n" +
 		"#define u32 uint\n" +
@@ -31,7 +32,9 @@ func compile(jpp string) string {
 		"#define str u8*\n")
 
 	wrap := 0
+	wrapf := 0
 	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - char, 4 - replaced, 5 - close with )
+	ms := false
 	for i := 0; i < len(jpp); i++ {
 		c := jpp[i]
 		l := 0
@@ -76,6 +79,26 @@ func compile(jpp string) string {
 			if context == 2 {
 				cpp.WriteByte(c)
 			}
+			continue
+		}
+		if c == '{' {
+			wrapf++
+		}
+		if c == '}' {
+			wrapf--
+		}
+
+		if c == '!' && jpp[i+1] == '%' && jpp[i+2] == ' ' && wrapf == 0 {
+			if !ms {
+				cpp.WriteString("i32 main() {\n")
+			}
+			context = 4
+			ms = true
+			continue
+		}
+		if c == '!' && jpp[i+1] == '%' && jpp[i+2] == '\n' && wrapf == 0 {
+			cpp.WriteString("}")
+			context = 1
 			continue
 		}
 		if i != 0 {
