@@ -14,6 +14,7 @@ u32 - uint
 u... - ...
 u8 - char
 str - u8*
+u0 -> void
 alloc(T, S) - (T*)malloc(typeof(T)*S)
 pbegin, pend, ppbegin - nabs profiler, requires #!use:nabsp
 ```
@@ -27,6 +28,6 @@ $!forr(count) - for (i32 _ = 0; _ < count; _++) [_ is random variable name]
 ```
 features:
 ```
-automatic commma: "i32 i = 0" -> "i32 i = 0;"
+automatic semilion: "i32 i = 0" -> "i32 i = 0;"
 automatic (): "if s == 3 {" -> "if (s == 3) {"
 ```
