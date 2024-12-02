@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"math/rand"
 	"strings"
+    "strconv"
 )
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
@@ -13,7 +14,12 @@ func compile(jpp string) string {
 	jpp = strings.ReplaceAll(jpp, "    ", "  ")
 	jpp = strings.ReplaceAll(jpp, "  ", "\n")
 	ec := false
-	cpp := bytes.NewBufferString("#include <cstdint>\n" +
+	cpp := bytes.NewBufferString(
+		"#ifdef __cplusplus\n" +
+		"#include <cstdint>\n" +
+		"#else\n" +
+		"#include <stdint.h>\n" +
+		"#endif\n" +
 		"#define i8 int8_t\n" +
 		"#define i16 int16_t\n" +
 		"#define i32 int\n" +
@@ -25,6 +31,19 @@ func compile(jpp string) string {
 		"#define u32 uint\n" +
 		"#define u64 ulong\n" +
 		"#define u128 ulong long\n" +
+		"#define I8 i8\n" +
+		"#define I16 i16\n" +
+		"#define I32 i32\n" +
+		"#define I64 i64\n" +
+		"#define I128 i128\n" +
+		"#define U0 u0\n" +
+		"#define U8 u8\n" +
+		"#define U16 u16\n" +
+		"#define U32 u32\n" +
+		"#define U64 u64\n" +
+		"#define U128 u128\n" +
+		"#define nil NULL\n" +
+		"#define ret return\n" +
 		"#define alloc(T, S) (T*)malloc(sizeof(T)*S)\n" +
 		"#define pbegin Nabs::PFunc profiler_wrap = Nabs::PBegin(__FILE__, __FUNCTION__, __LINE__)\n" +
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
@@ -75,7 +94,7 @@ func compile(jpp string) string {
 		if c == '\'' && context == 3 && l == 1 {
 			context = 0
 		}
-		if context == 2 || context == 1 || context == 4 || context == 5 || context == 3 {
+		if context == 2 || context == 1 || context == 4 || context == 5 || context == 3 { // pre-processer loop wall -----------------------------------------------------------------------------------------------------------------------------250 col
 			if context == 2 {
 				cpp.WriteByte(c)
 			}
@@ -132,23 +151,36 @@ func compile(jpp string) string {
 				if sp == "loop" {
 					cpp.WriteString("for (;;)")
 				}
-				if strings.HasPrefix(sp, "forr(") {
-					vname := "_"
-					l := strings.SplitN(sp[5:], ")", 2)[0]
-					for p := 0; p < 10; p++ {
-						vname += string(letterRunes[rand.Intn(len(letterRunes))])
-					}
-					cpp.WriteString("for (i32 " + vname + " = 0; " + vname + " < " + l + "; " + vname + "++")
-					context = 5
-				}
-				if strings.HasPrefix(sp, "for(") {
+				if strings.HasPrefix(sp, "lop(") {
 					sP := strings.SplitN(sp[4:], ";", 3)
-					vtype := sP[0]
-					vname := sP[1]
-					Sp := strings.SplitN(sP[2], "..", 2)
-					Sp[1] = Sp[1][:len(Sp[1])-1]
-					cpp.WriteString("for (" + vtype + " " + vname + " = " + Sp[0] + "; " + vname + " < " + Sp[1] + "; " + vname + "++")
-					context = 5
+					if len(sP) == 0 {
+						cpp.WriteString("for (;;)")
+					} else if len(sP) == 1 {
+						vname := "_"
+						for p := 0; p < 10; p++ {
+							vname += string(letterRunes[rand.Intn(len(letterRunes))])
+						}
+						loopLimit := strconv.Itoa(l)
+						cpp.WriteString("for (i32 " + vname + " = 0; " + vname + " < " + loopLimit + "; " + vname + "++")
+						context = 5
+					} else {
+						vtype := sP[0]
+						vname := sP[1]
+						Sp := strings.SplitN(sP[2], "..", 2)
+						Sp[1] = Sp[1][:len(Sp[1])-1]
+						op := "++"
+						op1 := " < "
+						a1, b1 := strconv.Atoi(Sp[0])
+						a2, b2 := strconv.Atoi(Sp[1])
+						if b1 == nil || b2 == nil {
+							if a1 > a2 {
+								op = "--"
+								op1 = " >= "
+							}
+						}
+						cpp.WriteString("for (" + vtype + " " + vname + " = " + Sp[0] + "; " + vname + op1 + Sp[1] + "; " + vname + op)
+						context = 5
+					}
 				}
 				if sp == "main" {
 					cpp.WriteString("int main()")
@@ -167,8 +199,24 @@ func compile(jpp string) string {
 						if sp[i] == "io" {
 							cpp.WriteString("#include <stdio.h>\n")
 						}
+						if sp[i] == "su" {
+							cpp.WriteString("#include <string.h>\n")
+							cpp.WriteString(
+								"void *_toheap(const void *value, U32 size) {\n" +
+								"    void *a = malloc(size);\n" +
+								"    memcpy(a, value, size);\n" +
+								"    return a;\n" +
+								"}\n" +
+								"#define toheap(T, V) ((T*)_toheap((u0*)&(V), sizeof(V)))\n")
+						}
+						if sp[i] == "winapi" {
+							cpp.WriteString("#include <windows.h>\n")
+						}
 						if sp[i] == "std" {
 							cpp.WriteString("#include <stdlib.h>\n")
+						}
+						if sp[i] == "math" {
+							cpp.WriteString("#include <math.h>\n")
 						}
 						if sp[i] == "ss" {
 							cpp.WriteString("#include <cstring.h>\n")
@@ -198,7 +246,7 @@ func compile(jpp string) string {
 				}
 				context = 1
 			}
-			if !(c == '{' || c == '}' || c == ';' || c == '\n' || c == '/' || c == '\t') &&
+			if !(c == '{' || c == '}' || c == ';' || c == '\n' || c == '/' || c == '\t' || c == '>') &&
 				((i < len(jpp)-1) && jpp[i+1] == '\n' ||
 					(i < len(jpp)-2 && jpp[i+1] == '/' && jpp[i+2] == '/')) {
 				cpp.WriteByte(c)

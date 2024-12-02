@@ -1,4 +1,24 @@
-#!use:io
+#!use:io,std,su
 
-!% printf("hello, world")
-!%
+$!mainA {
+    printf("binary name: %s, argument count: %d\n", argv[0], argc)
+    printf("hello, world!")
+    i32 i = 0
+    i32 v
+    if i <= 0 {
+        i = 2
+        v = 999
+    }
+    i32* alloced = toheap(i32, v)
+    printf("memory from heap: %d\n", *alloced)
+    free(alloced)
+    $!lop(i32;i;0..5) {
+        printf("current iter: %d\n", i)
+    }
+    $!lop(5) {
+        printf("current in loop\n")
+    }
+    printf("halt program\n")
+    $!loop {}
+    ret 0
+}
