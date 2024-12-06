@@ -1,0 +1,6 @@
+{
+    "main": "src/main.jpp",
+    "include": "src/modules",
+    "temp_folder": "temp",
+    "output_elf": "program.elf"
+}

@@ -1,0 +1,8 @@
+#!mod:utils.hpp
+#!use:io
+
+!% printf("main.jpp\n")
+
+printf("utils.jpp: %d\n", add(54, 6))
+ret 0
+!%
