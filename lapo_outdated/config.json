@@ -1,0 +1,13 @@
+{
+    "language": "c++",
+    "compiler_args": "",
+    "includes": {
+        "jppd": ["tests"],
+        "jppf": [],
+        "cppd": [],
+        "cppf": []
+    },
+    "output_dir": "cpps",
+    "macros": [
+    ]
+}
