@@ -23,14 +23,14 @@ func compile(jpp string) string {
 		"#define i8 int8_t\n" +
 		"#define i16 int16_t\n" +
 		"#define i32 int\n" +
-		"#define i64 long\n" +
-		"#define i128 long long\n" +
+		"#define i64 long long\n" +
+		"#define i128 __int128_t\n" +
 		"#define u0 void\n" +
 		"#define u8 char\n" +
 		"#define u16 uint16_t\n" +
 		"#define u32 uint\n" +
-		"#define u64 ulong\n" +
-		"#define u128 ulong long\n" +
+		"#define u64 ulong long\n" +
+		"#define u128 __uint128_t\n" +
 		"#define I8 i8\n" +
 		"#define I16 i16\n" +
 		"#define I32 i32\n" +
@@ -193,6 +193,12 @@ func compile(jpp string) string {
 			if jpp[i-1] == '\n' && c == '#' && jpp[i+1] == '!' {
 				s := strings.SplitN(jpp[i+2:], "\n", 2)[0]
 				s = strings.ReplaceAll(s, " ", "")
+				if strings.HasPrefix(s, "mod:") {
+					sp := strings.Split(s[4:], ",")
+					for i := 0; i < len(sp); i++ {
+						cpp.WriteString("#include \""+sp[i]+"\"\n")
+					}
+				}
 				if strings.HasPrefix(s, "use:") {
 					sp := strings.Split(s[4:], ",")
 					for i := 0; i < len(sp); i++ {
