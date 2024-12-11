@@ -10,7 +10,7 @@ import (
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
 
 func compile(jpp string) string {
-	jpp = "\n\n" + jpp
+	jpp = "\n\n" + jpp + "\n"
 	// jpp = strings.ReplaceAll(jpp, "    ", "  ")
 	// jpp = strings.ReplaceAll(jpp, "  ", "\n")
 	ec := false
@@ -58,6 +58,7 @@ func compile(jpp string) string {
 	wrapf := 0
 	context := 0 // 0 - code, 1 - inline comment, 2 - string, 3 - char, 4 - replaced, 5 - close with )
 	ms := false
+	mms := false
 	for i := 0; i < len(jpp); i++ {
 		c := jpp[i]
 		l := 0
@@ -74,7 +75,7 @@ func compile(jpp string) string {
 		if c == ')' && context == 5 {
 			wrap--
 		}
-		if context == 2 && c == '"' {
+		if context == 2 && c == '"' && jpp[i-1] != '\\' {
 			context = 0
 			l = 1
 		}
@@ -87,18 +88,18 @@ func compile(jpp string) string {
 		if c == '/' && jpp[i+1] == '/' {
 			context = 1
 		}
-		if context == 0 && c == '"' && l == 0 {
+		if context == 0 && c == '"' && l == 0 && jpp[i-1] != '\\' {
 			context = 2
 		}
 		l = 0
-		if c == '\'' && context == 3 {
+		if c == '\'' && context == 3 && jpp[i-1] != '\\' {
 			context = 0
 			l = 1
 		}
-		if c == '\'' && context == 3 && l == 1 {
+		if c == '\'' && context == 3 && l == 1 && jpp[i-1] != '\\' {
 			context = 0
 		}
-		if context == 2 || context == 1 || context == 4 || context == 5 || context == 3 { // pre-processer loop wall -----------------------------------------------------------------------------------------------------------------------------250 col
+		if context == 2 || context == 1 || context == 4 || context == 5 || context == 3 { // pre-processer loop big wall for defence -----------------------------------------------------------------------------------------------------------------------------250 col
 			if context == 2 {
 				cpp.WriteByte(c)
 			}
@@ -109,6 +110,48 @@ func compile(jpp string) string {
 		}
 		if c == '}' {
 			wrapf--
+		}
+
+		if wrapf == 0 && !mms && c != '\n' && c != '{' && c != '}' && c != '#' && i > 0 && jpp[i-1] == '\n' {
+			w1 := false
+			w2 := false
+			w3 := false
+			n := true
+			for j := i; j < len(jpp); j++ {
+				if jpp[j] == '\'' && jpp[j-1] != '\\' && !w2 && !w3 {
+					w1 = !w1
+				}
+				if jpp[j] == '"' && jpp[j-1] != '\\' && !w1 && !w3 {
+					w2 = !w2
+				}
+				if jpp[j] == '/' && jpp[j+1] == '/' && !w1 && !w2 {
+					w3 = true
+					n = false
+					break
+				}
+				if w1 || w2 || w3 {
+					continue
+				}
+				if jpp[j] == '{' || jpp[j] == '#' {
+					n = false
+					break
+				}
+				if jpp[j] == '\n' {
+					break
+				}
+			}
+			if w1 || w2 || w3 {
+				n = false
+			}
+			if n && !ms {
+				cpp.WriteString("i32 main() {\n")
+				ms = true
+			} else if n && ms {
+				cpp.WriteByte(c)
+				ms = false
+				mms = true
+				continue
+			}
 		}
 
 		if c == '!' && jpp[i+1] == '%' && jpp[i+2] == ' ' && wrapf == 0 {
@@ -265,6 +308,9 @@ func compile(jpp string) string {
 			}
 		}
 		cpp.WriteByte(c)
+	}
+	if mms {
+		cpp.WriteString("ret 0; \n}")
 	}
 	return cpp.String()
 }

@@ -31,8 +31,8 @@ if sys.argv[1] == "test":
 
 if sys.argv[1] == "install":
     if not os.path.exists("/bin/jpp"):
-        os.system("sudo cp build/jpp_linux-amd64.elf /bin/jpp")
+        os.system("sudo cp compiler /bin/jpp")
         os.system(f"sudo chown -c {os.getuid()} /bin/jpp")
     else:
-        os.system("cp build/jpp_linux-amd64.elf /bin/jpp")
+        os.system("cp compiler /bin/jpp")
     print("pp writed to /bin/jpp")
