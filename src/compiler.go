@@ -15,6 +15,8 @@ func compile(jpp string) string {
 	// jpp = strings.ReplaceAll(jpp, "  ", "\n")
 	ec := false
 	cpp := bytes.NewBufferString(
+		"#ifndef jppt\n" +
+		"#define jppt\n" +
 		"#define pi(I) printf(\"%d\", I)\n" +
 		"#define px(I) printf(\"%02X\", I)\n" +
 		"#define pf printf\n" +
@@ -52,7 +54,8 @@ func compile(jpp string) string {
 		"#define pbegin Nabs::PFunc profiler_wrap = Nabs::PBegin(__FILE__, __FUNCTION__, __LINE__)\n" +
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
 		"#define ppbegin Nabs::PClear()\n" +
-		"#define str i8*\n") // now i8 is c char
+		"#define str i8*\n" + // now i8 is c char
+		"#endif")
 
 	wrap := 0
 	wrapf := 0
