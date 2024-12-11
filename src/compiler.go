@@ -11,25 +11,29 @@ var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 
 func compile(jpp string) string {
 	jpp = "\n\n" + jpp
-	jpp = strings.ReplaceAll(jpp, "    ", "  ")
-	jpp = strings.ReplaceAll(jpp, "  ", "\n")
+	// jpp = strings.ReplaceAll(jpp, "    ", "  ")
+	// jpp = strings.ReplaceAll(jpp, "  ", "\n")
 	ec := false
 	cpp := bytes.NewBufferString(
+		"#define pi(I) printf(\"%d\", I)\n" +
+		"#define px(I) printf(\"%02X\", I)\n" +
+		"#define pf printf\n" +
+
 		"#ifdef __cplusplus\n" +
 		"#include <cstdint>\n" +
 		"#else\n" +
 		"#include <stdint.h>\n" +
 		"#endif\n" +
-		"#define i8 int8_t\n" +
+		"#define i8 char\n" +
 		"#define i16 int16_t\n" +
 		"#define i32 int\n" +
 		"#define i64 long long\n" +
 		"#define i128 __int128_t\n" +
 		"#define u0 void\n" +
-		"#define u8 char\n" +
+		"#define u8 unsigned char\n" +
 		"#define u16 uint16_t\n" +
-		"#define u32 uint\n" +
-		"#define u64 ulong long\n" +
+		"#define u32 unsigned int\n" +
+		"#define u64 unsigned long long\n" +
 		"#define u128 __uint128_t\n" +
 		"#define I8 i8\n" +
 		"#define I16 i16\n" +
@@ -48,7 +52,7 @@ func compile(jpp string) string {
 		"#define pbegin Nabs::PFunc profiler_wrap = Nabs::PBegin(__FILE__, __FUNCTION__, __LINE__)\n" +
 		"#define pend Nabs::PEnd(profiler_wrap)\n" +
 		"#define ppbegin Nabs::PClear()\n" +
-		"#define str u8*\n")
+		"#define str i8*\n") // now i8 is c char
 
 	wrap := 0
 	wrapf := 0
