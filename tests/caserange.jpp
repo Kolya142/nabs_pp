@@ -1,0 +1,19 @@
+#!use:io
+
+pf("detect character type:\n")
+
+switch '4' {
+    $!case('0';'9')
+        pf("is digit")
+        break
+    $!case('A';'Z')
+        pf("is big letter")
+        break
+    $!case('a';'z')
+        pf("is little letter")
+        break
+    default:
+        pf("is unknown char")
+        break
+}
+pf("\ndetected")

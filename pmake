@@ -36,3 +36,20 @@ if sys.argv[1] == "install":
     else:
         os.system("cp compiler /bin/jpp")
     print("pp writed to /bin/jpp")
+
+if sys.argv[1] == "all":
+    os.system("./pmake build-all")
+    os.system("./pmake build")
+    os.system("./pmake install")
+
+if sys.argv[1] == "pub":
+    os.system("./pmake build-all")
+    os.system("./pmake build")
+    os.system("./pmake install")
+    os.system("git add tests")
+    os.system("git add -u")
+    push = input("push(Y/*)?")
+    if push.upper()[0] == 'Y':
+        commit = input("commit name:")
+        os.system(f"git commit -m \"{commit}\"")
+        os.system(f"git push origin main")

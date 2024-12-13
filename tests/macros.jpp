@@ -1,0 +1,12 @@
+#!use:io
+
+#!macro DEBUG {
+    pf("Line: %d", __LINE__)
+    fflush(stdout)
+}
+
+
+pf("hello, world!\n")
+DEBUG
+*(char*)5 = '3'
+DEBUG

@@ -8,6 +8,7 @@ i32 d(i32 a, i32 b) {
     ret e(a, b)-a+b+b+e(b, a)
 }
 
+
 pf("Hello, world №%d!\n", e(5032, 1239))
 pf("todo: rewrite jpp in jpp\n")
 
