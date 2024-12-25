@@ -40,7 +40,8 @@ if sys.argv[1] == "install":
     plat = 0 if sys.platform.startswith("linux") else (1 if sys.platform.startswith("win") else (2 if sys.platform.startswith("darwin") else -1))
     if plat in (0, 2):
         install_path = "/usr/local/bin/jpp" if sys.platform.startswith("darwin") else "/usr/bin/jpp"
-        
+        install_path_lapo = "/usr/local/bin/lapo" if sys.platform.startswith("darwin") else "/usr/bin/lapo"
+
         safe_system("go build src/*")
 
         if not os.path.exists(install_path):
@@ -48,7 +49,14 @@ if sys.argv[1] == "install":
             safe_system(f"sudo chown -c {os.getuid()} {install_path}")
         else:
             safe_system(f"sudo cp compiler {install_path}")
+
+        if not os.path.exists(install_path):
+            safe_system(f"sudo cp lapo/lapo.py {install_path_lapo}")
+            safe_system(f"sudo chown -c {os.getuid()} {install_path_lapo}")
+        else:
+            safe_system(f"sudo cp lapo/lapo.py {install_path_lapo}")
         print(f"jpp installed to {install_path}")
+        print(f"lapo installed to {install_path_lapo}")
     elif plat == 1:
         import ctypes
         def is_admin():
@@ -67,11 +75,9 @@ if sys.argv[1] == "install":
             os.makedirs("C:/jpp")
 
         safe_system("go build src/*")
-
-        if not os.path.exists(install_path):
-            safe_system(f"copy compiler.exe {install_path}")
-        else:
-            safe_system(f"copy compiler.exe {install_path}")
+    
+        safe_system(f"copy lapo/lapo.py C:/jpp/lapo.py")
+        safe_system(f"copy compiler.exe {install_path}")
         print(f"jpp installed to {install_path}")
     else:
         print("Unsupported platform")
