@@ -1,11 +1,18 @@
 #!/bin/python
 import os
 import sys
+
+def safe_system(cmd: str) -> None:
+    code = os.system(cmd)
+    if code != 0:
+        print(f"Error: command exists with {code}.\n{cmd}")
+        sys.exit(1)
+
 if len(sys.argv) != 2:
     print("Usage: make.py <build,test,install,build-all>")
     exit(1)
 if sys.argv[1] == "build":
-    os.system("go build src/*")
+    safe_system("go build src/*")
 if sys.argv[1] == "build-all":
     if not os.path.exists("build"):
         os.mkdir("build")
@@ -21,35 +28,67 @@ if sys.argv[1] == "build-all":
     }
     for OS in oses:
         for ARCH in oses[OS]:
-            os.system(f"GOOS={OS} GOARCH={ARCH} go build src/main.go src/compiler.go")
+            safe_system(f"GOOS={OS} GOARCH={ARCH} go build src/main.go src/compiler.go")
             if OS == "windows":
                 os.rename("main.exe", f"build/jpp_{OS}-{ARCH}{extentions[OS]}")
             else:
                 os.rename("main", f"build/jpp_{OS}-{ARCH}{extentions[OS]}")
 if sys.argv[1] == "test":
-    os.system("python3 test.py")
+    safe_system("python3 test.py")
 
 if sys.argv[1] == "install":
-    if not os.path.exists("/bin/jpp"):
-        os.system("sudo cp compiler /bin/jpp")
-        os.system(f"sudo chown -c {os.getuid()} /bin/jpp")
+    plat = 0 if sys.platform.startswith("linux") else (1 if sys.platform.startswith("win") else (2 if sys.platform.startswith("darwin") else -1))
+    if plat in (0, 2):
+        install_path = "/usr/local/bin/jpp" if sys.platform.startswith("darwin") else "/usr/bin/jpp"
+        
+        safe_system("go build src/*")
+
+        if not os.path.exists(install_path):
+            safe_system(f"sudo cp compiler {install_path}")
+            safe_system(f"sudo chown -c {os.getuid()} {install_path}")
+        else:
+            safe_system(f"sudo cp compiler {install_path}")
+        print(f"jpp installed to {install_path}")
+    elif plat == 1:
+        import ctypes
+        def is_admin():
+            try:
+                return ctypes.windll.shell32.IsUserAnAdmin()
+            except:
+                return False
+        if not is_admin():
+            p = sys.argv[0]
+            script = os.path.abspath(p)
+            params = f'{script} {sys.argv[1]}'
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
+            sys.exit()
+        install_path = "C:/jpp/jpp.exe"
+        if not os.path.exists("C:/jpp"):
+            os.makedirs("C:/jpp")
+
+        safe_system("go build src/*")
+
+        if not os.path.exists(install_path):
+            safe_system(f"copy compiler.exe {install_path}")
+        else:
+            safe_system(f"copy compiler.exe {install_path}")
+        print(f"jpp installed to {install_path}")
     else:
-        os.system("cp compiler /bin/jpp")
-    print("pp writed to /bin/jpp")
+        print("Unsupported platform")
 
 if sys.argv[1] == "all":
-    os.system("./pmake build-all")
-    os.system("./pmake build")
-    os.system("./pmake install")
+    safe_system("./pmake build-all")
+    safe_system("./pmake build")
+    safe_system("./pmake install")
 
 if sys.argv[1] == "pub":
-    os.system("./pmake build-all")
-    os.system("./pmake build")
-    os.system("./pmake install")
-    os.system("git add tests")
-    os.system("git add -u")
+    safe_system("./pmake build-all")
+    safe_system("./pmake build")
+    safe_system("./pmake install")
+    safe_system("git add tests")
+    safe_system("git add -u")
     push = input("push(Y/*)?")
     if push.upper()[0] == 'Y':
         commit = input("commit name:")
-        os.system(f"git commit -m \"{commit}\"")
-        os.system(f"git push origin main")
+        safe_system(f"git commit -m \"{commit}\"")
+        safe_system(f"git push origin main")
